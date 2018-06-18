@@ -3,7 +3,7 @@ package iperf3
 import (
 	"bytes"
 	"encoding/json"
-	"log"
+	"errors"
 	"os/exec"
 	"strconv"
 )
@@ -49,17 +49,19 @@ func (c *IperfClient) Init() {
 }
 
 // Run runs the iperf command
-func (c *IperfClient) Run() ClientResult {
+func (c *IperfClient) Run() (ClientResult, error) {
 	cmd := exec.Command(c.ExecutablePath, c.flags...)
 	var out bytes.Buffer
 	cmd.Stdout = &out
+	var result ClientResult
 	err := cmd.Run()
 	if err != nil {
-		log.Println("Error: ", err)
+		var errorResult Error
+		json.Unmarshal(out.Bytes(), &errorResult)
+		return result, errors.New(errorResult.Error)
 	}
-	var result ClientResult
 	json.Unmarshal(out.Bytes(), &result)
-	return result
+	return result, nil
 }
 
 // NewIperf3Client creates a new iperf3 client with the given host

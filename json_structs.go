@@ -106,3 +106,8 @@ type Sum struct {
 	BitsPerSecond float64 `json:"bits_per_second"`
 	Omitted       bool    `json:"omitted"`
 }
+
+// Error contains the error from the iperf run
+type Error struct {
+	Error string `json:"error"`
+}
