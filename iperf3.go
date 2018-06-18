@@ -20,6 +20,7 @@ type IperfClient struct {
 	ForceIPv4      bool
 	ForceIPv6      bool
 	flags          []string
+	init           bool
 }
 
 // Init initializes all the flags for running the Iperf command
@@ -46,22 +47,26 @@ func (c *IperfClient) Init() {
 		c.flags = append(c.flags, "-p", strconv.Itoa(c.Port))
 	}
 	c.flags = append(c.flags, "-c", c.Host)
+	c.init = true
 }
 
 // Run runs the iperf command
 func (c *IperfClient) Run() (ClientResult, error) {
-	cmd := exec.Command(c.ExecutablePath, c.flags...)
-	var out bytes.Buffer
-	cmd.Stdout = &out
 	var result ClientResult
-	err := cmd.Run()
-	if err != nil {
-		var errorResult Error
-		json.Unmarshal(out.Bytes(), &errorResult)
-		return result, errors.New(errorResult.Error)
+	if c.init {
+		cmd := exec.Command(c.ExecutablePath, c.flags...)
+		var out bytes.Buffer
+		cmd.Stdout = &out
+		err := cmd.Run()
+		if err != nil {
+			var errorResult Error
+			json.Unmarshal(out.Bytes(), &errorResult)
+			return result, errors.New(errorResult.Error)
+		}
+		json.Unmarshal(out.Bytes(), &result)
+		return result, nil
 	}
-	json.Unmarshal(out.Bytes(), &result)
-	return result, nil
+	return result, errors.New("Init() must be called before Run()")
 }
 
 // NewIperf3Client creates a new iperf3 client with the given host
@@ -76,5 +81,6 @@ func NewIperf3Client(host string) IperfClient {
 		Reverse:        false,
 		ForceIPv4:      false,
 		ForceIPv6:      false,
+		init:           false,
 	}
 }
