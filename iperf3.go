@@ -29,7 +29,7 @@ func (c *IperfClient) Init() {
 		c.flags = append(c.flags, "-u")
 	}
 	if c.Reverse {
-		c.flags = append(c.flags, "-r")
+		c.flags = append(c.flags, "-R")
 	}
 	if c.ForceIPv4 {
 		c.flags = append(c.flags, "-4")
