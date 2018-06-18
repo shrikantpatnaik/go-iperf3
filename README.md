@@ -8,7 +8,7 @@ iperf3 must be installed on the system, if it is not available in the PATH, then
 
 ## Installation
 
-`go get -u shrikantpatnaik.com/go-iperf3`
+`go get -u github.com/shrikantpatnaik/go-iperf3`
 
 ## Usage
 
